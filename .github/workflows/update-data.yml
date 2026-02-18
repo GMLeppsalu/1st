@@ -6,6 +6,10 @@ on:
     # BMF typically publishes monthly reports around this date
     - cron: "0 10 20 * *"
   workflow_dispatch: # Allow manual trigger
+  push:
+    paths:
+      - "scraper.py"
+      - "requirements.txt"
 
 permissions:
   contents: write
