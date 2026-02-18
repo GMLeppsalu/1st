@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tax Revenue Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+    <script>
+        // Fallback if jsdelivr fails
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.6/chart.umd.min.js"><\/script>');
+        }
+    </script>
     <style>
         :root {
             --header-bg: #1a1a2e;
@@ -287,6 +293,12 @@
     // ============================================================
     //  SHARED UTILITIES
     // ============================================================
+    if (typeof Chart === 'undefined') {
+        console.error('[Dashboard] Chart.js failed to load! Charts will not render.');
+    } else {
+        console.log('[Dashboard] Chart.js loaded successfully, version:', Chart.version);
+    }
+
     const POSITIVE_COLOR = '#2ecc71';
     const NEGATIVE_COLOR = '#e74c3c';
     const POSITIVE_BG = 'rgba(46, 204, 113, 0.75)';
@@ -687,6 +699,12 @@
                 return;
             }
 
+            // Debug: log sample data and unique classification_desc values
+            console.log('[MTS] Total rows returned:', rawData.length);
+            console.log('[MTS] Sample rows:', rawData.slice(0, 5));
+            const uniqueDescs = [...new Set(rawData.map(r => r.classification_desc))];
+            console.log('[MTS] Unique classification_desc values:', uniqueDescs);
+
             // Build lookup: "YYYY-MM" -> { category -> amount }
             const monthMap = {};
             rawData.forEach(row => {
@@ -700,6 +718,10 @@
                 // Keep the first (largest) match per category per month
                 if (monthMap[ym][desc] == null) monthMap[ym][desc] = amt;
             });
+
+            // Debug: show matched data
+            console.log('[MTS] monthMap keys:', Object.keys(monthMap));
+            console.log('[MTS] Sample monthMap entry:', Object.entries(monthMap)[0]);
 
             // Sort months chronologically
             const sortedMonths = Object.keys(monthMap).sort();
@@ -832,7 +854,7 @@
             const filterDate = twoYearsAgo.toISOString().split('T')[0];
 
             // transaction_type is "Deposits" or "Withdrawals"; tax info is in transaction_catg_desc
-            const url = `${DTS_BASE}?filter=transaction_type:eq:Deposits,record_date:gte:${filterDate}&sort=-record_date&page[size]=5000&fields=record_date,transaction_type,transaction_catg_desc,transaction_today_amt`;
+            const url = `${DTS_BASE}?filter=transaction_type:eq:Deposits,record_date:gte:${filterDate}&sort=-record_date&page[size]=5000&fields=record_date,transaction_type,transaction_catg,transaction_today_amt`;
             const resp = await fetch(url);
             if (!resp.ok) throw new Error(`DTS API returned ${resp.status}`);
             const json = await resp.json();
@@ -843,15 +865,25 @@
                 return;
             }
 
-            // Filter for tax-related deposits — look for "tax" in the category description
+            // Debug: log sample data and unique category values
+            console.log('[DTS] Total rows returned:', rawData.length);
+            console.log('[DTS] Sample rows:', rawData.slice(0, 5));
+            const uniqueCats = [...new Set(rawData.map(r => r.transaction_catg))];
+            console.log('[DTS] Unique transaction_catg values:', uniqueCats);
+
+            // Filter for tax-related deposits — look for "tax" in the category
+            // The real category data is in transaction_catg (transaction_catg_desc is always null)
             // This covers "Federal Tax Deposits", "Tax and Loan Note Accounts", etc.
             const taxRows = rawData.filter(row => {
-                const desc = (row.transaction_catg_desc || '').toLowerCase();
+                const desc = (row.transaction_catg || '').toLowerCase();
                 return desc.includes('tax') || desc.includes('total');
             });
 
+            console.log('[DTS] Tax-filtered rows:', taxRows.length, 'out of', rawData.length);
+
             // If no tax-specific rows, fall back to using all deposits
             const useRows = taxRows.length > 0 ? taxRows : rawData;
+            console.log('[DTS] Using', useRows.length, 'rows', taxRows.length > 0 ? '(tax-filtered)' : '(all deposits fallback)');
 
             // Aggregate by date (sum all tax-related deposit line items per day)
             const dateMap = {};
