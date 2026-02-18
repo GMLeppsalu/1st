@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>German Tax Revenue Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --header-bg: #1a1a2e;
+            --accent: #0f3460;
+            --positive: #2ecc71;
+            --negative: #e74c3c;
+            --card-bg: #ffffff;
+            --body-bg: #f0f2f5;
+            --text: #333333;
+            --text-light: #666666;
+            --border: #dee2e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--body-bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--header-bg);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .last-updated {
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 400px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        thead {
+            background: var(--header-bg);
+            color: white;
+        }
+
+        th, td {
+            padding: 0.6rem 0.8rem;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th:first-child, td:first-child {
+            text-align: left;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .yoy-positive {
+            color: var(--positive);
+            font-weight: 600;
+        }
+
+        .yoy-negative {
+            color: var(--negative);
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .error-msg {
+            text-align: center;
+            padding: 2rem;
+            color: var(--negative);
+            background: #ffeaea;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>German Tax Revenue Dashboard</h1>
+    <p>Year-over-year analysis of federal tax collections</p>
+</header>
+<div class="last-updated" id="lastUpdated">Loading data...</div>
+
+<div class="container">
+    <!-- Monthly BMF Section -->
+    <h2 class="section-title">Monthly Data (BMF)</h2>
+    <div id="bmfSection">
+        <div class="loading">Loading BMF monthly data...</div>
+    </div>
+
+    <!-- Quarterly Destatis Section -->
+    <h2 class="section-title">Quarterly Data (Destatis)</h2>
+    <div id="genesisSection">
+        <div class="loading">Loading Destatis quarterly data...</div>
+    </div>
+</div>
+
+<script>
+    const POSITIVE_COLOR = '#2ecc71';
+    const NEGATIVE_COLOR = '#e74c3c';
+    const POSITIVE_BG = 'rgba(46, 204, 113, 0.75)';
+    const NEGATIVE_BG = 'rgba(231, 76, 60, 0.75)';
+    const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function formatBn(val) {
+        if (val == null) return '—';
+        return (val / 1000).toFixed(2) + ' bn';
+    }
+
+    function formatBnRaw(val) {
+        if (val == null) return '—';
+        return '€' + (val / 1000).toFixed(2) + 'bn';
+    }
+
+    function formatPct(val) {
+        if (val == null) return '—';
+        return (val >= 0 ? '+' : '') + val.toFixed(1) + '%';
+    }
+
+    function yoyClass(val) {
+        if (val == null) return '';
+        return val >= 0 ? 'yoy-positive' : 'yoy-negative';
+    }
+
+    function barColors(values) {
+        return values.map(v => v >= 0 ? POSITIVE_BG : NEGATIVE_BG);
+    }
+
+    function barBorders(values) {
+        return values.map(v => v >= 0 ? POSITIVE_COLOR : NEGATIVE_COLOR);
+    }
+
+    function createBarChart(canvasId, labels, values, title) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: title,
+                    data: values,
+                    backgroundColor: barColors(values),
+                    borderColor: barBorders(values),
+                    borderWidth: 1.5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: title,
+                        font: { size: 14, weight: '600' }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => formatPct(ctx.parsed.y)
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: v => v.toFixed(1) + '%'
+                        },
+                        title: {
+                            display: true,
+                            text: 'YoY Change (%)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function createGroupedBarChart(canvasId, labels, datasets, title) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: title,
+                        font: { size: 14, weight: '600' }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ctx.dataset.label + ': ' + formatPct(ctx.parsed.y)
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: v => v.toFixed(1) + '%'
+                        },
+                        title: {
+                            display: true,
+                            text: 'YoY Change (%)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ---- BMF Monthly Data ----
+    async function loadBMF() {
+        const section = document.getElementById('bmfSection');
+        try {
+            const resp = await fetch('data/bmf_monthly.json');
+            if (!resp.ok) throw new Error('Could not load bmf_monthly.json');
+            const json = await resp.json();
+            const data = json.data;
+
+            if (!data || data.length === 0) {
+                section.innerHTML = '<div class="error-msg">No BMF monthly data available. Run the scraper to fetch data.</div>';
+                return json.last_updated;
+            }
+
+            // Build lookup: year -> month -> categories
+            const lookup = {};
+            data.forEach(d => {
+                if (!lookup[d.year]) lookup[d.year] = {};
+                lookup[d.year][d.month] = d.categories;
+            });
+
+            const years = Object.keys(lookup).map(Number).sort();
+            if (years.length < 2) {
+                section.innerHTML = '<div class="error-msg">Need at least two years of data for YoY comparison.</div>';
+                return json.last_updated;
+            }
+
+            // Pick the year pair with the most overlapping months for comparison.
+            // If the latest year has very few months, prefer the previous full-year pair.
+            let currentYear, prevYear;
+            const latestYear = years[years.length - 1];
+            const latestMonths = Object.keys(lookup[latestYear]).length;
+            if (latestMonths < 3 && years.length >= 3) {
+                // Latest year has too few months — use the two preceding years
+                currentYear = years[years.length - 2];
+                prevYear = years[years.length - 3];
+            } else {
+                currentYear = latestYear;
+                prevYear = years[years.length - 2];
+            }
+
+            const totalLabels = [];
+            const totalYoY = [];
+            const totalCurrent = [];
+            const totalPrev = [];
+
+            for (let m = 1; m <= 12; m++) {
+                const cur = lookup[currentYear]?.[m];
+                const prev = lookup[prevYear]?.[m];
+                if (!cur || !prev) continue;
+                const curVal = cur['total tax revenue'];
+                const prevVal = prev['total tax revenue'];
+                if (curVal == null || prevVal == null || prevVal === 0) continue;
+                totalLabels.push(MONTH_NAMES[m - 1] + ' ' + currentYear);
+                totalYoY.push(((curVal - prevVal) / Math.abs(prevVal)) * 100);
+                totalCurrent.push(curVal);
+                totalPrev.push(prevVal);
+            }
+
+            // Compute YoY by category
+            const catKeys = ['wages tax', 'turnover tax (vat)', 'corporation tax'];
+            const catLabels = ['Wages Tax', 'VAT', 'Corporation Tax'];
+            const catColors = ['#3498db', '#e67e22', '#9b59b6'];
+            const breakdownLabels = [];
+            const catYoYData = catKeys.map(() => []);
+
+            for (let m = 1; m <= 12; m++) {
+                const cur = lookup[currentYear]?.[m];
+                const prev = lookup[prevYear]?.[m];
+                if (!cur || !prev) continue;
+                let anyValid = false;
+                catKeys.forEach((key, i) => {
+                    const curVal = cur[key];
+                    const prevVal = prev[key];
+                    if (curVal != null && prevVal != null && prevVal !== 0) {
+                        catYoYData[i].push(((curVal - prevVal) / Math.abs(prevVal)) * 100);
+                        anyValid = true;
+                    } else {
+                        catYoYData[i].push(null);
+                    }
+                });
+                if (anyValid) {
+                    breakdownLabels.push(MONTH_NAMES[m - 1] + ' ' + currentYear);
+                }
+            }
+
+            // Build HTML
+            let html = '';
+
+            // Total YoY chart
+            if (totalLabels.length > 0) {
+                html += `<div class="card">
+                    <div class="chart-container">
+                        <canvas id="bmfTotalChart"></canvas>
+                    </div>
+                </div>`;
+            }
+
+            // Category breakdown chart
+            if (breakdownLabels.length > 0) {
+                html += `<div class="card">
+                    <div class="chart-container">
+                        <canvas id="bmfCategoryChart"></canvas>
+                    </div>
+                </div>`;
+            }
+
+            // Data table
+            html += `<div class="card">
+                <h3>Monthly Tax Revenue — Raw Data &amp; YoY Change</h3>
+                <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Total (€mn) ${currentYear}</th>
+                            <th>Total (€mn) ${prevYear}</th>
+                            <th>YoY %</th>`;
+            catLabels.forEach(label => {
+                html += `<th>${label} YoY %</th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            for (let i = 0; i < totalLabels.length; i++) {
+                const yoy = totalYoY[i];
+                html += `<tr>
+                    <td>${totalLabels[i]}</td>
+                    <td>${totalCurrent[i] != null ? totalCurrent[i].toLocaleString() : '—'}</td>
+                    <td>${totalPrev[i] != null ? totalPrev[i].toLocaleString() : '—'}</td>
+                    <td class="${yoyClass(yoy)}">${formatPct(yoy)}</td>`;
+                catKeys.forEach((_, ci) => {
+                    const v = catYoYData[ci]?.[i];
+                    html += `<td class="${yoyClass(v)}">${formatPct(v)}</td>`;
+                });
+                html += `</tr>`;
+            }
+
+            html += `</tbody></table></div></div>`;
+            section.innerHTML = html;
+
+            // Render charts
+            if (totalLabels.length > 0) {
+                createBarChart('bmfTotalChart', totalLabels, totalYoY,
+                    `Total Tax Revenue — YoY % Change (${prevYear} → ${currentYear})`);
+            }
+
+            if (breakdownLabels.length > 0) {
+                const datasets = catKeys.map((_, i) => ({
+                    label: catLabels[i],
+                    data: catYoYData[i],
+                    backgroundColor: catColors[i],
+                    borderColor: catColors[i],
+                    borderWidth: 1.5,
+                }));
+                createGroupedBarChart('bmfCategoryChart', breakdownLabels, datasets,
+                    `Tax Category Breakdown — YoY % Change (${prevYear} → ${currentYear})`);
+            }
+
+            return json.last_updated;
+        } catch (err) {
+            section.innerHTML = `<div class="error-msg">Error loading BMF data: ${err.message}</div>`;
+            return null;
+        }
+    }
+
+    // ---- GENESIS Quarterly Data ----
+    async function loadGenesis() {
+        const section = document.getElementById('genesisSection');
+        try {
+            const resp = await fetch('data/genesis_quarterly.json');
+            if (!resp.ok) throw new Error('Could not load genesis_quarterly.json');
+            const json = await resp.json();
+            const data = json.data;
+
+            if (!data || data.length === 0) {
+                section.innerHTML = '<div class="error-msg">No Destatis quarterly data available. Run the scraper to fetch data.</div>';
+                return json.last_updated;
+            }
+
+            // Aggregate by year+quarter (sum across categories if needed)
+            const qMap = {};
+            data.forEach(d => {
+                const key = d.year + '-' + d.quarter;
+                if (!qMap[key]) qMap[key] = { year: d.year, quarter: d.quarter, total: 0 };
+                qMap[key].total += (d.value_meur || 0);
+            });
+
+            // Sort by year then quarter
+            const quarters = Object.values(qMap).sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.quarter.localeCompare(b.quarter);
+            });
+
+            // Compute YoY: match same quarter across years
+            const yoyLabels = [];
+            const yoyValues = [];
+            const rawRows = [];
+
+            for (let i = 0; i < quarters.length; i++) {
+                const cur = quarters[i];
+                // Find same quarter in previous year
+                const prev = quarters.find(
+                    q => q.year === cur.year - 1 && q.quarter === cur.quarter
+                );
+                if (!prev || prev.total === 0) continue;
+                const yoy = ((cur.total - prev.total) / Math.abs(prev.total)) * 100;
+                yoyLabels.push(cur.quarter + ' ' + cur.year);
+                yoyValues.push(yoy);
+                rawRows.push({ label: cur.quarter + ' ' + cur.year, current: cur.total, prev: prev.total, yoy });
+            }
+
+            let html = '';
+
+            if (yoyLabels.length > 0) {
+                html += `<div class="card">
+                    <div class="chart-container">
+                        <canvas id="genesisChart"></canvas>
+                    </div>
+                </div>`;
+            }
+
+            // Data table
+            html += `<div class="card">
+                <h3>Quarterly Tax Revenue — Raw Data &amp; YoY Change</h3>
+                <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Quarter</th>
+                            <th>Revenue (€mn)</th>
+                            <th>Previous Year (€mn)</th>
+                            <th>YoY %</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            rawRows.forEach(row => {
+                html += `<tr>
+                    <td>${row.label}</td>
+                    <td>${row.current.toLocaleString()}</td>
+                    <td>${row.prev.toLocaleString()}</td>
+                    <td class="${yoyClass(row.yoy)}">${formatPct(row.yoy)}</td>
+                </tr>`;
+            });
+
+            html += `</tbody></table></div></div>`;
+            section.innerHTML = html;
+
+            if (yoyLabels.length > 0) {
+                createBarChart('genesisChart', yoyLabels, yoyValues,
+                    'Quarterly Total Tax Revenue — YoY % Change');
+            }
+
+            return json.last_updated;
+        } catch (err) {
+            section.innerHTML = `<div class="error-msg">Error loading Destatis data: ${err.message}</div>`;
+            return null;
+        }
+    }
+
+    // ---- Init ----
+    (async function () {
+        const [bmfTs, genesisTs] = await Promise.all([loadBMF(), loadGenesis()]);
+        const ts = bmfTs || genesisTs;
+        const el = document.getElementById('lastUpdated');
+        if (ts) {
+            const d = new Date(ts);
+            el.textContent = 'Data last updated: ' + d.toLocaleString('en-GB', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+            });
+        } else {
+            el.textContent = 'No data loaded — run the scraper to fetch data.';
+        }
+    })();
+</script>
+
+</body>
+</html>

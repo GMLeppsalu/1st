@@ -1,0 +1,149 @@
+{
+  "last_updated": "2026-02-18T12:17:10Z",
+  "data": [
+    {
+      "year": 2020,
+      "quarter": "Q1",
+      "category": "total",
+      "value_meur": 170200
+    },
+    {
+      "year": 2020,
+      "quarter": "Q2",
+      "category": "total",
+      "value_meur": 142800
+    },
+    {
+      "year": 2020,
+      "quarter": "Q3",
+      "category": "total",
+      "value_meur": 172500
+    },
+    {
+      "year": 2020,
+      "quarter": "Q4",
+      "category": "total",
+      "value_meur": 191100
+    },
+    {
+      "year": 2021,
+      "quarter": "Q1",
+      "category": "total",
+      "value_meur": 173800
+    },
+    {
+      "year": 2021,
+      "quarter": "Q2",
+      "category": "total",
+      "value_meur": 175900
+    },
+    {
+      "year": 2021,
+      "quarter": "Q3",
+      "category": "total",
+      "value_meur": 188200
+    },
+    {
+      "year": 2021,
+      "quarter": "Q4",
+      "category": "total",
+      "value_meur": 208500
+    },
+    {
+      "year": 2022,
+      "quarter": "Q1",
+      "category": "total",
+      "value_meur": 194300
+    },
+    {
+      "year": 2022,
+      "quarter": "Q2",
+      "category": "total",
+      "value_meur": 197600
+    },
+    {
+      "year": 2022,
+      "quarter": "Q3",
+      "category": "total",
+      "value_meur": 201400
+    },
+    {
+      "year": 2022,
+      "quarter": "Q4",
+      "category": "total",
+      "value_meur": 222800
+    },
+    {
+      "year": 2023,
+      "quarter": "Q1",
+      "category": "total",
+      "value_meur": 196100
+    },
+    {
+      "year": 2023,
+      "quarter": "Q2",
+      "category": "total",
+      "value_meur": 199800
+    },
+    {
+      "year": 2023,
+      "quarter": "Q3",
+      "category": "total",
+      "value_meur": 205700
+    },
+    {
+      "year": 2023,
+      "quarter": "Q4",
+      "category": "total",
+      "value_meur": 226300
+    },
+    {
+      "year": 2024,
+      "quarter": "Q1",
+      "category": "total",
+      "value_meur": 193500
+    },
+    {
+      "year": 2024,
+      "quarter": "Q2",
+      "category": "total",
+      "value_meur": 198200
+    },
+    {
+      "year": 2024,
+      "quarter": "Q3",
+      "category": "total",
+      "value_meur": 207900
+    },
+    {
+      "year": 2024,
+      "quarter": "Q4",
+      "category": "total",
+      "value_meur": 229100
+    },
+    {
+      "year": 2025,
+      "quarter": "Q1",
+      "category": "total",
+      "value_meur": 200400
+    },
+    {
+      "year": 2025,
+      "quarter": "Q2",
+      "category": "total",
+      "value_meur": 205800
+    },
+    {
+      "year": 2025,
+      "quarter": "Q3",
+      "category": "total",
+      "value_meur": 214600
+    },
+    {
+      "year": 2025,
+      "quarter": "Q4",
+      "category": "total",
+      "value_meur": 238200
+    }
+  ]
+}

@@ -1,0 +1,355 @@
+{
+  "last_updated": "2026-02-18T12:17:44Z",
+  "data": [
+    {
+      "year": 2024,
+      "month": 1,
+      "categories": {
+        "total tax revenue": 60100,
+        "joint taxes": 49900,
+        "wages tax": 17400,
+        "assessed income tax": 2000,
+        "corporation tax": 1700,
+        "turnover tax (vat)": 21200,
+        "federal taxes": 5000,
+        "länder taxes": 5200
+      }
+    },
+    {
+      "year": 2024,
+      "month": 2,
+      "categories": {
+        "total tax revenue": 51800,
+        "joint taxes": 42600,
+        "wages tax": 16700,
+        "assessed income tax": 1400,
+        "corporation tax": 1100,
+        "turnover tax (vat)": 19000,
+        "federal taxes": 4500,
+        "länder taxes": 4700
+      }
+    },
+    {
+      "year": 2024,
+      "month": 3,
+      "categories": {
+        "total tax revenue": 64500,
+        "joint taxes": 53700,
+        "wages tax": 18300,
+        "assessed income tax": 3000,
+        "corporation tax": 2200,
+        "turnover tax (vat)": 22500,
+        "federal taxes": 5300,
+        "länder taxes": 5500
+      }
+    },
+    {
+      "year": 2024,
+      "month": 4,
+      "categories": {
+        "total tax revenue": 55800,
+        "joint taxes": 46200,
+        "wages tax": 17000,
+        "assessed income tax": 1700,
+        "corporation tax": 1500,
+        "turnover tax (vat)": 20100,
+        "federal taxes": 4700,
+        "länder taxes": 4900
+      }
+    },
+    {
+      "year": 2024,
+      "month": 5,
+      "categories": {
+        "total tax revenue": 59700,
+        "joint taxes": 49500,
+        "wages tax": 17700,
+        "assessed income tax": 2100,
+        "corporation tax": 1800,
+        "turnover tax (vat)": 21100,
+        "federal taxes": 5000,
+        "länder taxes": 5200
+      }
+    },
+    {
+      "year": 2024,
+      "month": 6,
+      "categories": {
+        "total tax revenue": 69200,
+        "joint taxes": 57900,
+        "wages tax": 19400,
+        "assessed income tax": 3900,
+        "corporation tax": 3300,
+        "turnover tax (vat)": 23200,
+        "federal taxes": 5500,
+        "länder taxes": 5800
+      }
+    },
+    {
+      "year": 2024,
+      "month": 7,
+      "categories": {
+        "total tax revenue": 58300,
+        "joint taxes": 48300,
+        "wages tax": 17200,
+        "assessed income tax": 1800,
+        "corporation tax": 1400,
+        "turnover tax (vat)": 20700,
+        "federal taxes": 4900,
+        "länder taxes": 5100
+      }
+    },
+    {
+      "year": 2024,
+      "month": 8,
+      "categories": {
+        "total tax revenue": 57100,
+        "joint taxes": 47200,
+        "wages tax": 16900,
+        "assessed income tax": 1600,
+        "corporation tax": 1300,
+        "turnover tax (vat)": 20400,
+        "federal taxes": 4800,
+        "länder taxes": 5100
+      }
+    },
+    {
+      "year": 2024,
+      "month": 9,
+      "categories": {
+        "total tax revenue": 65400,
+        "joint taxes": 54600,
+        "wages tax": 18700,
+        "assessed income tax": 3200,
+        "corporation tax": 2600,
+        "turnover tax (vat)": 22100,
+        "federal taxes": 5300,
+        "länder taxes": 5500
+      }
+    },
+    {
+      "year": 2024,
+      "month": 10,
+      "categories": {
+        "total tax revenue": 58700,
+        "joint taxes": 48700,
+        "wages tax": 17300,
+        "assessed income tax": 1900,
+        "corporation tax": 1600,
+        "turnover tax (vat)": 20900,
+        "federal taxes": 4900,
+        "länder taxes": 5100
+      }
+    },
+    {
+      "year": 2024,
+      "month": 11,
+      "categories": {
+        "total tax revenue": 61100,
+        "joint taxes": 50700,
+        "wages tax": 17900,
+        "assessed income tax": 2200,
+        "corporation tax": 2000,
+        "turnover tax (vat)": 21400,
+        "federal taxes": 5100,
+        "länder taxes": 5300
+      }
+    },
+    {
+      "year": 2024,
+      "month": 12,
+      "categories": {
+        "total tax revenue": 73400,
+        "joint taxes": 61500,
+        "wages tax": 20600,
+        "assessed income tax": 4500,
+        "corporation tax": 3800,
+        "turnover tax (vat)": 24100,
+        "federal taxes": 5800,
+        "länder taxes": 6100
+      }
+    },
+    {
+      "year": 2025,
+      "month": 1,
+      "categories": {
+        "total tax revenue": 62850,
+        "joint taxes": 52300,
+        "wages tax": 18200,
+        "assessed income tax": 2100,
+        "corporation tax": 1800,
+        "turnover tax (vat)": 22100,
+        "federal taxes": 5200,
+        "länder taxes": 5350
+      }
+    },
+    {
+      "year": 2025,
+      "month": 2,
+      "categories": {
+        "total tax revenue": 54200,
+        "joint taxes": 44800,
+        "wages tax": 17500,
+        "assessed income tax": 1500,
+        "corporation tax": 1200,
+        "turnover tax (vat)": 19800,
+        "federal taxes": 4700,
+        "länder taxes": 4700
+      }
+    },
+    {
+      "year": 2025,
+      "month": 3,
+      "categories": {
+        "total tax revenue": 67300,
+        "joint taxes": 56200,
+        "wages tax": 19100,
+        "assessed income tax": 3200,
+        "corporation tax": 2400,
+        "turnover tax (vat)": 23500,
+        "federal taxes": 5500,
+        "länder taxes": 5600
+      }
+    },
+    {
+      "year": 2025,
+      "month": 4,
+      "categories": {
+        "total tax revenue": 58100,
+        "joint taxes": 48300,
+        "wages tax": 17800,
+        "assessed income tax": 1800,
+        "corporation tax": 1600,
+        "turnover tax (vat)": 20900,
+        "federal taxes": 4900,
+        "länder taxes": 4900
+      }
+    },
+    {
+      "year": 2025,
+      "month": 5,
+      "categories": {
+        "total tax revenue": 62400,
+        "joint taxes": 51900,
+        "wages tax": 18500,
+        "assessed income tax": 2300,
+        "corporation tax": 2000,
+        "turnover tax (vat)": 22000,
+        "federal taxes": 5200,
+        "länder taxes": 5300
+      }
+    },
+    {
+      "year": 2025,
+      "month": 6,
+      "categories": {
+        "total tax revenue": 72100,
+        "joint taxes": 60500,
+        "wages tax": 20200,
+        "assessed income tax": 4100,
+        "corporation tax": 3500,
+        "turnover tax (vat)": 24200,
+        "federal taxes": 5700,
+        "länder taxes": 5900
+      }
+    },
+    {
+      "year": 2025,
+      "month": 7,
+      "categories": {
+        "total tax revenue": 60900,
+        "joint taxes": 50600,
+        "wages tax": 18000,
+        "assessed income tax": 1900,
+        "corporation tax": 1500,
+        "turnover tax (vat)": 21600,
+        "federal taxes": 5100,
+        "länder taxes": 5200
+      }
+    },
+    {
+      "year": 2025,
+      "month": 8,
+      "categories": {
+        "total tax revenue": 59500,
+        "joint taxes": 49300,
+        "wages tax": 17600,
+        "assessed income tax": 1700,
+        "corporation tax": 1400,
+        "turnover tax (vat)": 21200,
+        "federal taxes": 5000,
+        "länder taxes": 5200
+      }
+    },
+    {
+      "year": 2025,
+      "month": 9,
+      "categories": {
+        "total tax revenue": 68200,
+        "joint taxes": 57000,
+        "wages tax": 19500,
+        "assessed income tax": 3400,
+        "corporation tax": 2800,
+        "turnover tax (vat)": 23100,
+        "federal taxes": 5500,
+        "länder taxes": 5700
+      }
+    },
+    {
+      "year": 2025,
+      "month": 10,
+      "categories": {
+        "total tax revenue": 61300,
+        "joint taxes": 50900,
+        "wages tax": 18100,
+        "assessed income tax": 2000,
+        "corporation tax": 1700,
+        "turnover tax (vat)": 21800,
+        "federal taxes": 5100,
+        "länder taxes": 5300
+      }
+    },
+    {
+      "year": 2025,
+      "month": 11,
+      "categories": {
+        "total tax revenue": 63800,
+        "joint taxes": 53100,
+        "wages tax": 18700,
+        "assessed income tax": 2400,
+        "corporation tax": 2100,
+        "turnover tax (vat)": 22300,
+        "federal taxes": 5300,
+        "länder taxes": 5400
+      }
+    },
+    {
+      "year": 2025,
+      "month": 12,
+      "categories": {
+        "total tax revenue": 76500,
+        "joint taxes": 64200,
+        "wages tax": 21500,
+        "assessed income tax": 4800,
+        "corporation tax": 4000,
+        "turnover tax (vat)": 25100,
+        "federal taxes": 6000,
+        "länder taxes": 6300
+      }
+    },
+    {
+      "year": 2026,
+      "month": 1,
+      "categories": {
+        "total tax revenue": 65200,
+        "joint taxes": 54300,
+        "wages tax": 18900,
+        "assessed income tax": 2200,
+        "corporation tax": 1900,
+        "turnover tax (vat)": 23000,
+        "federal taxes": 5400,
+        "länder taxes": 5500
+      }
+    }
+  ]
+}
