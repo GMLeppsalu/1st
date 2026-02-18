@@ -3,14 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Revenue Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-    <script>
-        // Fallback if jsdelivr fails
-        if (typeof Chart === 'undefined') {
-            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.6/chart.umd.min.js"><\/script>');
-        }
-    </script>
+    <title>German Tax Collection Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.6/chart.umd.min.js"></script>
     <style>
         :root {
             --header-bg: #1a1a2e;
@@ -40,7 +34,7 @@
         header {
             background: var(--header-bg);
             color: white;
-            padding: 1.5rem 2rem 0;
+            padding: 1.5rem 2rem;
             text-align: center;
         }
 
@@ -53,45 +47,6 @@
         header p {
             font-size: 0.95rem;
             opacity: 0.85;
-            margin-bottom: 1rem;
-        }
-
-        /* Tab navigation */
-        .tab-nav {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-        }
-
-        .tab-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
-            border: none;
-            padding: 0.7rem 2rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .tab-btn.active {
-            background: var(--body-bg);
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
         }
 
         .last-updated {
@@ -106,16 +61,6 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 1.5rem;
-        }
-
-        .data-note {
-            background: #eef2ff;
-            border-left: 4px solid var(--accent);
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            border-radius: 0 6px 6px 0;
         }
 
         .section-title {
@@ -190,21 +135,6 @@
             font-size: 1.1rem;
         }
 
-        .spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         .error-msg {
             text-align: center;
             padding: 2rem;
@@ -228,64 +158,28 @@
             header h1 {
                 font-size: 1.4rem;
             }
-
-            .tab-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.9rem;
-            }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Tax Revenue Dashboard</h1>
-    <p>Year-over-year analysis of tax collections</p>
-    <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('germany')">Germany</button>
-        <button class="tab-btn" onclick="switchTab('us')">United States</button>
-    </div>
+    <h1>German Tax Collection Dashboard</h1>
+    <p>Year-over-year analysis of German tax collections</p>
 </header>
 
-<!-- ===================== GERMANY TAB ===================== -->
-<div class="tab-content active" id="tab-germany">
-    <div class="last-updated" id="lastUpdated">Loading data...</div>
-    <div class="container">
-        <!-- Monthly BMF Section -->
-        <h2 class="section-title">Monthly Data (BMF)</h2>
-        <div id="bmfSection">
-            <div class="loading">Loading BMF monthly data...</div>
-        </div>
-
-        <!-- Quarterly Destatis Section -->
-        <h2 class="section-title">Quarterly Data (Destatis)</h2>
-        <div id="genesisSection">
-            <div class="loading">Loading Destatis quarterly data...</div>
-        </div>
+<div class="last-updated" id="lastUpdated">Loading data...</div>
+<div class="container">
+    <!-- Monthly BMF Section -->
+    <h2 class="section-title">Monthly Data (BMF)</h2>
+    <div id="bmfSection">
+        <div class="loading">Loading BMF monthly data...</div>
     </div>
-</div>
 
-<!-- ===================== US TAB ===================== -->
-<div class="tab-content" id="tab-us">
-    <div class="last-updated" id="usLastUpdated">Loading US Treasury data...</div>
-    <div class="container">
-        <div class="data-note">
-            Data sources: Monthly Treasury Statement (MTS) and Daily Treasury Statement (DTS) via
-            <a href="https://fiscaldata.treasury.gov/" target="_blank" rel="noopener">US Treasury Fiscal Data API</a>.
-            Monthly data updated ~6 weeks after month-end. Daily data updated each business day.
-        </div>
-
-        <!-- Monthly MTS Section -->
-        <h2 class="section-title">Section 1 — Monthly Data (MTS)</h2>
-        <div id="mtsSection">
-            <div class="loading"><div class="spinner"></div><br>Loading MTS monthly data...</div>
-        </div>
-
-        <!-- Daily DTS Section -->
-        <h2 class="section-title">Section 2 — Daily Data (DTS)</h2>
-        <div id="dtsSection">
-            <div class="loading"><div class="spinner"></div><br>Loading DTS daily data...</div>
-        </div>
+    <!-- Quarterly Destatis Section -->
+    <h2 class="section-title">Quarterly Data (Destatis)</h2>
+    <div id="genesisSection">
+        <div class="loading">Loading Destatis quarterly data...</div>
     </div>
 </div>
 
@@ -293,12 +187,6 @@
     // ============================================================
     //  SHARED UTILITIES
     // ============================================================
-    if (typeof Chart === 'undefined') {
-        console.error('[Dashboard] Chart.js failed to load! Charts will not render.');
-    } else {
-        console.log('[Dashboard] Chart.js loaded successfully, version:', Chart.version);
-    }
-
     const POSITIVE_COLOR = '#2ecc71';
     const NEGATIVE_COLOR = '#e74c3c';
     const POSITIVE_BG = 'rgba(46, 204, 113, 0.75)';
@@ -324,7 +212,6 @@
         return values.map(v => v >= 0 ? POSITIVE_COLOR : NEGATIVE_COLOR);
     }
 
-    // Keep track of all Chart instances so we can destroy them on tab switch
     const chartInstances = {};
 
     function destroyChart(id) {
@@ -410,62 +297,8 @@
         return chart;
     }
 
-    function createLineChart(canvasId, labels, datasets, title, yLabel) {
-        destroyChart(canvasId);
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: { labels, datasets },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: title,
-                        font: { size: 14, weight: '600' }
-                    }
-                },
-                scales: {
-                    y: {
-                        title: { display: true, text: yLabel }
-                    }
-                },
-                elements: {
-                    point: { radius: 0 },
-                    line: { borderWidth: 2 }
-                }
-            }
-        });
-        chartInstances[canvasId] = chart;
-        return chart;
-    }
-
     // ============================================================
-    //  TAB SWITCHING
-    // ============================================================
-    let usDataLoaded = false;
-
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-
-        if (tab === 'us') {
-            document.querySelectorAll('.tab-btn')[1].classList.add('active');
-            document.getElementById('tab-us').classList.add('active');
-            if (!usDataLoaded) {
-                usDataLoaded = true;
-                loadUSData();
-            }
-        } else {
-            document.querySelectorAll('.tab-btn')[0].classList.add('active');
-            document.getElementById('tab-germany').classList.add('active');
-        }
-    }
-
-    // ============================================================
-    //  GERMANY — BMF Monthly Data
+    //  BMF Monthly Data
     // ============================================================
     async function loadBMF() {
         const section = document.getElementById('bmfSection');
@@ -553,7 +386,7 @@
             html += `<div class="card">
                 <h3>Monthly Tax Revenue — Raw Data &amp; YoY Change</h3>
                 <div style="overflow-x:auto;"><table><thead><tr>
-                    <th>Month</th><th>Total (€mn) ${currentYear}</th><th>Total (€mn) ${prevYear}</th><th>YoY %</th>`;
+                    <th>Month</th><th>Total (&#8364;mn) ${currentYear}</th><th>Total (&#8364;mn) ${prevYear}</th><th>YoY %</th>`;
             catLabels.forEach(l => { html += `<th>${l} YoY %</th>`; });
             html += `</tr></thead><tbody>`;
 
@@ -592,7 +425,7 @@
     }
 
     // ============================================================
-    //  GERMANY — GENESIS Quarterly Data
+    //  GENESIS Quarterly Data
     // ============================================================
     async function loadGenesis() {
         const section = document.getElementById('genesisSection');
@@ -636,7 +469,7 @@
             }
             html += `<div class="card"><h3>Quarterly Tax Revenue — Raw Data &amp; YoY Change</h3>
                 <div style="overflow-x:auto;"><table><thead><tr>
-                    <th>Quarter</th><th>Revenue (€mn)</th><th>Previous Year (€mn)</th><th>YoY %</th>
+                    <th>Quarter</th><th>Revenue (&#8364;mn)</th><th>Previous Year (&#8364;mn)</th><th>YoY %</th>
                 </tr></thead><tbody>`;
             rawRows.forEach(row => {
                 html += `<tr><td>${row.label}</td>
@@ -657,420 +490,7 @@
     }
 
     // ============================================================
-    //  US — MTS Monthly Data
-    // ============================================================
-    const MTS_BASE = 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_1';
-
-    // Flexible matching: the API may use slightly different names (e.g. "Total" vs "Total Receipts")
-    const MTS_MATCH_RULES = [
-        { key: 'Individual Income Taxes',                  patterns: ['individual income tax'] },
-        { key: 'Corporation Income Taxes',                 patterns: ['corporation income tax'] },
-        { key: 'Social Insurance and Retirement Receipts', patterns: ['social insurance', 'social security'] },
-        { key: 'Excise Taxes',                             patterns: ['excise tax'] },
-        { key: 'Total Receipts',                           patterns: ['total receipts', 'total--receipts'] },
-    ];
-
-    // Also accept an exact match on just "Total" as a fallback for Total Receipts
-    function normalizeMTSCategory(raw) {
-        if (!raw) return null;
-        const lower = raw.trim().toLowerCase();
-        for (const rule of MTS_MATCH_RULES) {
-            if (rule.patterns.some(p => lower.includes(p))) return rule.key;
-        }
-        if (lower === 'total') return 'Total Receipts';
-        return null;
-    }
-
-    async function loadMTS() {
-        const section = document.getElementById('mtsSection');
-        try {
-            const threeYearsAgo = new Date();
-            threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
-            const filterDate = threeYearsAgo.toISOString().split('T')[0];
-
-            const url = `${MTS_BASE}?filter=record_date:gte:${filterDate}&sort=-record_date&page[size]=2000&fields=record_date,classification_desc,current_month_gross_rcpt_amt`;
-            const resp = await fetch(url);
-            if (!resp.ok) throw new Error(`MTS API returned ${resp.status}`);
-            const json = await resp.json();
-            const rawData = json.data;
-
-            if (!rawData || rawData.length === 0) {
-                section.innerHTML = '<div class="error-msg">No MTS data returned from the Treasury API.</div>';
-                return;
-            }
-
-            // Debug: log sample data and unique classification_desc values
-            console.log('[MTS] Total rows returned:', rawData.length);
-            console.log('[MTS] Sample rows:', rawData.slice(0, 5));
-            const uniqueDescs = [...new Set(rawData.map(r => r.classification_desc))];
-            console.log('[MTS] Unique classification_desc values:', uniqueDescs);
-
-            // Build lookup: "YYYY-MM" -> { category -> amount }
-            const monthMap = {};
-            rawData.forEach(row => {
-                const desc = normalizeMTSCategory(row.classification_desc);
-                if (!desc) return;
-                const date = row.record_date; // "YYYY-MM-DD"
-                const ym = date.substring(0, 7);    // "YYYY-MM"
-                const amt = parseFloat(row.current_month_gross_rcpt_amt);
-                if (isNaN(amt)) return;
-                if (!monthMap[ym]) monthMap[ym] = {};
-                // Keep the first (largest) match per category per month
-                if (monthMap[ym][desc] == null) monthMap[ym][desc] = amt;
-            });
-
-            // Debug: show matched data
-            console.log('[MTS] monthMap keys:', Object.keys(monthMap));
-            console.log('[MTS] Sample monthMap entry:', Object.entries(monthMap)[0]);
-
-            // Sort months chronologically
-            const sortedMonths = Object.keys(monthMap).sort();
-
-            // Build rolling 24-month YoY for Total Receipts
-            const totalLabels = [], totalYoY = [];
-            const tableRows = [];
-
-            sortedMonths.forEach(ym => {
-                const [y, m] = ym.split('-').map(Number);
-                const prevYm = (y - 1) + '-' + String(m).padStart(2, '0');
-                const curTotal = monthMap[ym]?.['Total Receipts'];
-                const prevTotal = monthMap[prevYm]?.['Total Receipts'];
-                if (curTotal == null || prevTotal == null || prevTotal === 0) return;
-
-                const yoyPct = ((curTotal - prevTotal) / Math.abs(prevTotal)) * 100;
-                const yoyDollar = curTotal - prevTotal;
-                const label = MONTH_NAMES[m - 1] + ' ' + y;
-
-                totalLabels.push(label);
-                totalYoY.push(yoyPct);
-                tableRows.push({
-                    label,
-                    total: curTotal,
-                    yoyDollar,
-                    yoyPct
-                });
-            });
-
-            // Take last 24 months
-            const last24Labels = totalLabels.slice(-24);
-            const last24YoY = totalYoY.slice(-24);
-            const last24Rows = tableRows.slice(-24);
-
-            // Build category YoY for Chart 2
-            const catKeys = ['Individual Income Taxes', 'Corporation Income Taxes', 'Social Insurance and Retirement Receipts'];
-            const catShortLabels = ['Individual Income', 'Corporate Income', 'Payroll (Social Ins.)'];
-            const catChartColors = ['#3498db', '#e67e22', '#9b59b6'];
-            const catLabels = [];
-            const catYoYData = catKeys.map(() => []);
-
-            sortedMonths.forEach(ym => {
-                const [y, m] = ym.split('-').map(Number);
-                const prevYm = (y - 1) + '-' + String(m).padStart(2, '0');
-                let anyValid = false;
-
-                catKeys.forEach((key, i) => {
-                    const cur = monthMap[ym]?.[key];
-                    const prev = monthMap[prevYm]?.[key];
-                    if (cur != null && prev != null && prev !== 0) {
-                        catYoYData[i].push(((cur - prev) / Math.abs(prev)) * 100);
-                        anyValid = true;
-                    } else {
-                        catYoYData[i].push(null);
-                    }
-                });
-                if (anyValid) catLabels.push(MONTH_NAMES[m - 1] + ' ' + y);
-            });
-
-            const last24CatLabels = catLabels.slice(-24);
-            const last24CatData = catYoYData.map(arr => arr.slice(-24));
-
-            // Build HTML
-            let html = '';
-
-            // Chart 1
-            if (last24Labels.length > 0) {
-                html += `<div class="card"><h3>Chart 1: YoY % Change in Total Receipts (Rolling 24 Months)</h3>
-                    <div class="chart-container"><canvas id="mtsChart1"></canvas></div></div>`;
-            }
-
-            // Chart 2
-            if (last24CatLabels.length > 0) {
-                html += `<div class="card"><h3>Chart 2: YoY % Change by Tax Category</h3>
-                    <div class="chart-container"><canvas id="mtsChart2"></canvas></div></div>`;
-            }
-
-            // Data table
-            html += `<div class="card"><h3>Monthly Total Receipts — Data Table</h3>
-                <div style="overflow-x:auto;"><table><thead><tr>
-                    <th>Month</th><th>Total Receipts ($bn)</th><th>YoY $ Change ($bn)</th><th>YoY %</th>
-                </tr></thead><tbody>`;
-
-            // Show most recent first in table
-            [...last24Rows].reverse().forEach(row => {
-                const totalBn = (row.total / 1e6).toFixed(2);   // API amounts are in millions
-                const chgBn = (row.yoyDollar / 1e6).toFixed(2);
-                html += `<tr>
-                    <td>${row.label}</td>
-                    <td>$${totalBn}bn</td>
-                    <td class="${yoyClass(row.yoyDollar)}">${row.yoyDollar >= 0 ? '+' : ''}$${chgBn}bn</td>
-                    <td class="${yoyClass(row.yoyPct)}">${formatPct(row.yoyPct)}</td></tr>`;
-            });
-            html += `</tbody></table></div></div>`;
-
-            section.innerHTML = html;
-
-            // Render charts
-            if (last24Labels.length > 0) {
-                createBarChart('mtsChart1', last24Labels, last24YoY, 'Total Receipts — YoY % Change');
-            }
-            if (last24CatLabels.length > 0) {
-                const datasets = catKeys.map((_, i) => ({
-                    label: catShortLabels[i],
-                    data: last24CatData[i],
-                    backgroundColor: catChartColors[i],
-                    borderColor: catChartColors[i],
-                    borderWidth: 1.5,
-                }));
-                createGroupedBarChart('mtsChart2', last24CatLabels, datasets, 'Tax Category — YoY % Change');
-            }
-
-            return sortedMonths[sortedMonths.length - 1]; // latest month key
-        } catch (err) {
-            section.innerHTML = `<div class="error-msg">Error loading MTS data: ${err.message}<br><small>The US Treasury API may be temporarily unavailable. Try refreshing.</small></div>`;
-            return null;
-        }
-    }
-
-    // ============================================================
-    //  US — DTS Daily Data
-    // ============================================================
-    const DTS_BASE = 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/dts/deposits_withdrawals_operating_cash';
-
-    async function loadDTS() {
-        const section = document.getElementById('dtsSection');
-        try {
-            const twoYearsAgo = new Date();
-            twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-            const filterDate = twoYearsAgo.toISOString().split('T')[0];
-
-            // transaction_type is "Deposits" or "Withdrawals"; tax info is in transaction_catg_desc
-            const url = `${DTS_BASE}?filter=transaction_type:eq:Deposits,record_date:gte:${filterDate}&sort=-record_date&page[size]=5000&fields=record_date,transaction_type,transaction_catg,transaction_today_amt`;
-            const resp = await fetch(url);
-            if (!resp.ok) throw new Error(`DTS API returned ${resp.status}`);
-            const json = await resp.json();
-            const rawData = json.data;
-
-            if (!rawData || rawData.length === 0) {
-                section.innerHTML = '<div class="error-msg">No DTS deposit data returned from the Treasury API.</div>';
-                return;
-            }
-
-            // Debug: log sample data and unique category values
-            console.log('[DTS] Total rows returned:', rawData.length);
-            console.log('[DTS] Sample rows:', rawData.slice(0, 5));
-            const uniqueCats = [...new Set(rawData.map(r => r.transaction_catg))];
-            console.log('[DTS] Unique transaction_catg values:', uniqueCats);
-
-            // Filter for tax-related deposits — look for "tax" in the category
-            // The real category data is in transaction_catg (transaction_catg_desc is always null)
-            // This covers "Federal Tax Deposits", "Tax and Loan Note Accounts", etc.
-            const taxRows = rawData.filter(row => {
-                const desc = (row.transaction_catg || '').toLowerCase();
-                return desc.includes('tax') || desc.includes('total');
-            });
-
-            console.log('[DTS] Tax-filtered rows:', taxRows.length, 'out of', rawData.length);
-
-            // If no tax-specific rows, fall back to using all deposits
-            const useRows = taxRows.length > 0 ? taxRows : rawData;
-            console.log('[DTS] Using', useRows.length, 'rows', taxRows.length > 0 ? '(tax-filtered)' : '(all deposits fallback)');
-
-            // Aggregate by date (sum all tax-related deposit line items per day)
-            const dateMap = {};
-            useRows.forEach(row => {
-                const date = row.record_date;
-                const amt = parseFloat(row.transaction_today_amt) || 0;
-                if (!dateMap[date]) dateMap[date] = 0;
-                dateMap[date] += amt;
-            });
-
-            // Parse into sorted array (oldest first)
-            const dailyData = Object.entries(dateMap).map(([date, amt]) => ({
-                date, amt
-            })).sort((a, b) => a.date.localeCompare(b.date));
-
-            // Determine current year and prior year
-            const latestDate = new Date(dailyData[dailyData.length - 1].date);
-            const currentYear = latestDate.getFullYear();
-            const priorYear = currentYear - 1;
-
-            // Build day-of-year lookup for the line chart overlay
-            function dayOfYear(dateStr) {
-                const d = new Date(dateStr);
-                const start = new Date(d.getFullYear(), 0, 0);
-                return Math.floor((d - start) / (1000 * 60 * 60 * 24));
-            }
-
-            const curYearData = {};
-            const prevYearData = {};
-            dailyData.forEach(d => {
-                const yr = parseInt(d.date.substring(0, 4));
-                const doy = dayOfYear(d.date);
-                if (yr === currentYear) curYearData[doy] = d.amt;
-                else if (yr === priorYear) prevYearData[doy] = d.amt;
-            });
-
-            // Chart 3: daily deposits overlay — current year vs prior year
-            const allDoys = new Set([...Object.keys(curYearData), ...Object.keys(prevYearData)]);
-            const sortedDoys = [...allDoys].map(Number).sort((a, b) => a - b);
-
-            const chart3Labels = sortedDoys.map(doy => {
-                const d = new Date(currentYear, 0, doy);
-                return MONTH_NAMES[d.getMonth()] + ' ' + d.getDate();
-            });
-            const chart3CurData = sortedDoys.map(d => curYearData[d] != null ? curYearData[d] / 1e3 : null); // convert to $bn
-            const chart3PrevData = sortedDoys.map(d => prevYearData[d] != null ? prevYearData[d] / 1e3 : null);
-
-            // Chart 4: Rolling 30-day sum, YoY % change
-            // Build by date for rolling calculations
-            const dateAmtMap = {};
-            dailyData.forEach(d => { dateAmtMap[d.date] = d.amt; });
-            const allDates = dailyData.map(d => d.date);
-
-            function rolling30Sum(dateStr) {
-                const end = new Date(dateStr);
-                let sum = 0, count = 0;
-                for (let i = 0; i < 30; i++) {
-                    const d = new Date(end);
-                    d.setDate(d.getDate() - i);
-                    const key = d.toISOString().split('T')[0];
-                    if (dateAmtMap[key] != null) {
-                        sum += dateAmtMap[key];
-                        count++;
-                    }
-                }
-                return count > 0 ? sum : null;
-            }
-
-            const chart4Labels = [], chart4Values = [];
-            // Only compute for dates where we have both this year and last year's rolling sums
-            const uniqueDates = [...new Set(allDates)].sort();
-            uniqueDates.forEach(dateStr => {
-                const yr = parseInt(dateStr.substring(0, 4));
-                if (yr < currentYear && yr < priorYear) return; // skip too-old dates
-                const prevDateStr = (yr - 1) + dateStr.substring(4);
-
-                const curSum = rolling30Sum(dateStr);
-                const prevSum = rolling30Sum(prevDateStr);
-                if (curSum == null || prevSum == null || prevSum === 0) return;
-
-                const yoyPct = ((curSum - prevSum) / Math.abs(prevSum)) * 100;
-                const d = new Date(dateStr);
-                chart4Labels.push(MONTH_NAMES[d.getMonth()] + ' ' + d.getDate() + ', ' + yr);
-                chart4Values.push(yoyPct);
-            });
-
-            // Table: last 20 business days
-            const recentDays = dailyData.slice(-40); // grab extra to find prior year matches
-            const tableRows = [];
-            for (let i = dailyData.length - 1; i >= 0 && tableRows.length < 20; i--) {
-                const d = dailyData[i];
-                const yr = parseInt(d.date.substring(0, 4));
-                const prevDateStr = (yr - 1) + d.date.substring(4);
-                const prevAmt = dateAmtMap[prevDateStr];
-                const yoyPct = (prevAmt != null && prevAmt !== 0)
-                    ? ((d.amt - prevAmt) / Math.abs(prevAmt)) * 100
-                    : null;
-                tableRows.push({
-                    date: d.date,
-                    amt: d.amt,
-                    prevAmt: prevAmt,
-                    yoyPct
-                });
-            }
-
-            // Build HTML
-            let html = '';
-
-            // Chart 3
-            html += `<div class="card"><h3>Chart 3: Daily Deposits — ${currentYear} vs ${priorYear}</h3>
-                <div class="chart-container"><canvas id="dtsChart3"></canvas></div></div>`;
-
-            // Chart 4
-            if (chart4Labels.length > 0) {
-                html += `<div class="card"><h3>Chart 4: Rolling 30-Day Deposits — YoY % Change</h3>
-                    <div class="chart-container"><canvas id="dtsChart4"></canvas></div></div>`;
-            }
-
-            // Table
-            html += `<div class="card"><h3>Recent Daily Deposits (Last 20 Business Days)</h3>
-                <div style="overflow-x:auto;"><table><thead><tr>
-                    <th>Date</th><th>Daily Deposit ($bn)</th><th>Same Day Prior Year ($bn)</th><th>YoY %</th>
-                </tr></thead><tbody>`;
-            tableRows.forEach(row => {
-                const amtBn = (row.amt / 1e3).toFixed(3);
-                const prevBn = row.prevAmt != null ? (row.prevAmt / 1e3).toFixed(3) : '—';
-                html += `<tr>
-                    <td>${row.date}</td>
-                    <td>$${amtBn}bn</td>
-                    <td>${row.prevAmt != null ? '$' + prevBn + 'bn' : '—'}</td>
-                    <td class="${yoyClass(row.yoyPct)}">${formatPct(row.yoyPct)}</td></tr>`;
-            });
-            html += `</tbody></table></div></div>`;
-
-            section.innerHTML = html;
-
-            // Render Chart 3
-            createLineChart('dtsChart3', chart3Labels, [
-                {
-                    label: String(currentYear),
-                    data: chart3CurData,
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                    fill: false,
-                    spanGaps: true,
-                },
-                {
-                    label: String(priorYear),
-                    data: chart3PrevData,
-                    borderColor: '#95a5a6',
-                    backgroundColor: 'rgba(149, 165, 166, 0.1)',
-                    fill: false,
-                    spanGaps: true,
-                    borderDash: [5, 3],
-                }
-            ], `Daily Deposits: ${currentYear} vs ${priorYear}`, 'Amount ($bn)');
-
-            // Render Chart 4
-            if (chart4Labels.length > 0) {
-                createBarChart('dtsChart4', chart4Labels, chart4Values, 'Rolling 30-Day Deposits — YoY % Change');
-            }
-
-            return dailyData[dailyData.length - 1]?.date;
-        } catch (err) {
-            section.innerHTML = `<div class="error-msg">Error loading DTS data: ${err.message}<br><small>The US Treasury API may be temporarily unavailable. Try refreshing.</small></div>`;
-            return null;
-        }
-    }
-
-    // ============================================================
-    //  US — Init both sections
-    // ============================================================
-    async function loadUSData() {
-        const [mtsTs, dtsTs] = await Promise.all([loadMTS(), loadDTS()]);
-        const el = document.getElementById('usLastUpdated');
-        const parts = [];
-        if (mtsTs) parts.push('MTS: ' + mtsTs);
-        if (dtsTs) parts.push('DTS: ' + dtsTs);
-        if (parts.length > 0) {
-            el.textContent = 'US data latest records — ' + parts.join(' | ');
-        } else {
-            el.textContent = 'Could not load US Treasury data. Check your connection and try again.';
-        }
-    }
-
-    // ============================================================
-    //  INIT — Load Germany tab immediately
+    //  INIT
     // ============================================================
     (async function () {
         const [bmfTs, genesisTs] = await Promise.all([loadBMF(), loadGenesis()]);
