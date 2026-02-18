@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tax Revenue Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.7/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --header-bg: #1a1a2e;
@@ -648,13 +648,26 @@
     //  US — MTS Monthly Data
     // ============================================================
     const MTS_BASE = 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_1';
-    const MTS_CATEGORIES = [
-        'Individual Income Taxes',
-        'Corporation Income Taxes',
-        'Social Insurance and Retirement Receipts',
-        'Excise Taxes',
-        'Total Receipts'
+
+    // Flexible matching: the API may use slightly different names (e.g. "Total" vs "Total Receipts")
+    const MTS_MATCH_RULES = [
+        { key: 'Individual Income Taxes',                  patterns: ['individual income tax'] },
+        { key: 'Corporation Income Taxes',                 patterns: ['corporation income tax'] },
+        { key: 'Social Insurance and Retirement Receipts', patterns: ['social insurance', 'social security'] },
+        { key: 'Excise Taxes',                             patterns: ['excise tax'] },
+        { key: 'Total Receipts',                           patterns: ['total receipts', 'total--receipts'] },
     ];
+
+    // Also accept an exact match on just "Total" as a fallback for Total Receipts
+    function normalizeMTSCategory(raw) {
+        if (!raw) return null;
+        const lower = raw.trim().toLowerCase();
+        for (const rule of MTS_MATCH_RULES) {
+            if (rule.patterns.some(p => lower.includes(p))) return rule.key;
+        }
+        if (lower === 'total') return 'Total Receipts';
+        return null;
+    }
 
     async function loadMTS() {
         const section = document.getElementById('mtsSection');
@@ -677,14 +690,15 @@
             // Build lookup: "YYYY-MM" -> { category -> amount }
             const monthMap = {};
             rawData.forEach(row => {
-                const desc = row.classification_desc?.trim();
-                if (!MTS_CATEGORIES.includes(desc)) return;
+                const desc = normalizeMTSCategory(row.classification_desc);
+                if (!desc) return;
                 const date = row.record_date; // "YYYY-MM-DD"
                 const ym = date.substring(0, 7);    // "YYYY-MM"
                 const amt = parseFloat(row.current_month_gross_rcpt_amt);
                 if (isNaN(amt)) return;
                 if (!monthMap[ym]) monthMap[ym] = {};
-                monthMap[ym][desc] = amt;
+                // Keep the first (largest) match per category per month
+                if (monthMap[ym][desc] == null) monthMap[ym][desc] = amt;
             });
 
             // Sort months chronologically
@@ -817,22 +831,40 @@
             twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
             const filterDate = twoYearsAgo.toISOString().split('T')[0];
 
-            const url = `${DTS_BASE}?filter=transaction_type:eq:Tax Deposits,record_date:gte:${filterDate}&sort=-record_date&page[size]=2000&fields=record_date,transaction_type,transaction_today_amt`;
+            // transaction_type is "Deposits" or "Withdrawals"; tax info is in transaction_catg_desc
+            const url = `${DTS_BASE}?filter=transaction_type:eq:Deposits,record_date:gte:${filterDate}&sort=-record_date&page[size]=5000&fields=record_date,transaction_type,transaction_catg_desc,transaction_today_amt`;
             const resp = await fetch(url);
             if (!resp.ok) throw new Error(`DTS API returned ${resp.status}`);
             const json = await resp.json();
             const rawData = json.data;
 
             if (!rawData || rawData.length === 0) {
-                // Try alternate: some DTS categories use different descriptions
-                section.innerHTML = '<div class="error-msg">No DTS Tax Deposit data returned. The API may use a different classification.</div>';
+                section.innerHTML = '<div class="error-msg">No DTS deposit data returned from the Treasury API.</div>';
                 return;
             }
 
+            // Filter for tax-related deposits — look for "tax" in the category description
+            // This covers "Federal Tax Deposits", "Tax and Loan Note Accounts", etc.
+            const taxRows = rawData.filter(row => {
+                const desc = (row.transaction_catg_desc || '').toLowerCase();
+                return desc.includes('tax') || desc.includes('total');
+            });
+
+            // If no tax-specific rows, fall back to using all deposits
+            const useRows = taxRows.length > 0 ? taxRows : rawData;
+
+            // Aggregate by date (sum all tax-related deposit line items per day)
+            const dateMap = {};
+            useRows.forEach(row => {
+                const date = row.record_date;
+                const amt = parseFloat(row.transaction_today_amt) || 0;
+                if (!dateMap[date]) dateMap[date] = 0;
+                dateMap[date] += amt;
+            });
+
             // Parse into sorted array (oldest first)
-            const dailyData = rawData.map(row => ({
-                date: row.record_date,
-                amt: parseFloat(row.transaction_today_amt) || 0
+            const dailyData = Object.entries(dateMap).map(([date, amt]) => ({
+                date, amt
             })).sort((a, b) => a.date.localeCompare(b.date));
 
             // Determine current year and prior year
@@ -929,17 +961,17 @@
             let html = '';
 
             // Chart 3
-            html += `<div class="card"><h3>Chart 3: Daily Tax Deposits — ${currentYear} vs ${priorYear}</h3>
+            html += `<div class="card"><h3>Chart 3: Daily Deposits — ${currentYear} vs ${priorYear}</h3>
                 <div class="chart-container"><canvas id="dtsChart3"></canvas></div></div>`;
 
             // Chart 4
             if (chart4Labels.length > 0) {
-                html += `<div class="card"><h3>Chart 4: Rolling 30-Day Tax Deposits — YoY % Change</h3>
+                html += `<div class="card"><h3>Chart 4: Rolling 30-Day Deposits — YoY % Change</h3>
                     <div class="chart-container"><canvas id="dtsChart4"></canvas></div></div>`;
             }
 
             // Table
-            html += `<div class="card"><h3>Recent Daily Tax Deposits (Last 20 Business Days)</h3>
+            html += `<div class="card"><h3>Recent Daily Deposits (Last 20 Business Days)</h3>
                 <div style="overflow-x:auto;"><table><thead><tr>
                     <th>Date</th><th>Daily Deposit ($bn)</th><th>Same Day Prior Year ($bn)</th><th>YoY %</th>
                 </tr></thead><tbody>`;
@@ -975,11 +1007,11 @@
                     spanGaps: true,
                     borderDash: [5, 3],
                 }
-            ], `Daily Tax Deposits: ${currentYear} vs ${priorYear}`, 'Amount ($bn)');
+            ], `Daily Deposits: ${currentYear} vs ${priorYear}`, 'Amount ($bn)');
 
             // Render Chart 4
             if (chart4Labels.length > 0) {
-                createBarChart('dtsChart4', chart4Labels, chart4Values, 'Rolling 30-Day Tax Deposits — YoY % Change');
+                createBarChart('dtsChart4', chart4Labels, chart4Values, 'Rolling 30-Day Deposits — YoY % Change');
             }
 
             return dailyData[dailyData.length - 1]?.date;
